@@ -69,6 +69,8 @@ def write_secret():
 
 
 
+from requests import post
+
 @app.route('/generate_secret_voucher', methods=['GET', 'POST'])
 def generate_secret_voucher():
     if request.method == 'POST':
@@ -76,12 +78,12 @@ def generate_secret_voucher():
         first, second = base_path.split('/', 1)
         secret_path = '{}/data/{}'.format(first, second)
         try:
-            secret_response = client.read(secret_path)
+            secret_response = client.read(secret_path[4:])
             secret_data = secret_response['data']['data']
 
             # Wrap the secret data using the Vault API
-            headers = {'X-Vault-Token': vault_token, 'X-Vault-Namespace': 'admin', 'X-Vault-Wrap-TTL': '300'}
-            wrap_response = post(vault_address + 'v1/sys/wrapping/wrap', headers=headers, json=secret_data)
+            headers = {'X-Vault-Token': vault_token, 'X-Vault-Namespace': 'admin', 'X-Vault-Wrap-TTL': '120'}
+            wrap_response = post(vault_address + '/v1/sys/wrapping/wrap', headers=headers, json=secret_data)
             wrap_token = wrap_response.json()['wrap_info']['token']
             wrap_url = url_for('unwrap_secret', wrap_token=wrap_token, _external=True)
             return render_template('result.html', message="Secret Voucher URL: {}".format(wrap_url))
@@ -93,6 +95,7 @@ def generate_secret_voucher():
             <input type="submit" value="Generate Secret Voucher">
         </form>
     '''
+
 
 
 
