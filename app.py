@@ -43,7 +43,19 @@ def write_secret():
         key = request.form.get('key')
         value = request.form.get('value')
         try:
-            client.write(secret_path, data={key: value})
+            # Read the secret at the given path
+            secret_response = client.read(secret_path)
+
+            # If the secret exists, update the data dictionary with the new key-value pair
+            if secret_response:
+                data = secret_response['data']['data']
+                data[key] = value
+            # If the secret does not exist, create a new data dictionary with the key-value pair
+            else:
+                data = {key: value}
+
+            # Write the updated data dictionary back to Vault
+            client.write(secret_path, data=data)
             return render_template('result.html', message="Secret written successfully.")
         except Exception as e:
             return render_template('result.html', message="Error writing secret: {}".format(e))
