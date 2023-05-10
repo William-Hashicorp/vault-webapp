@@ -14,10 +14,13 @@ client = hvac.Client(url=vault_address, token=vault_token, namespace="admin")
 def index():
     return render_template('index.html')
 
+# ...
 @app.route('/read_secret', methods=['GET', 'POST'])
 def read_secret():
     if request.method == 'POST':
-        secret_path = request.form.get('path')
+        base_path = request.form.get('path')
+        first, second = base_path.split('/', 1)
+        secret_path = '{}/data/{}'.format(first, second)  # Insert 'data' between the first level path and the remaining
         try:
             secret_response = client.read(secret_path)
             secret_data = secret_response['data']['data']
@@ -34,7 +37,9 @@ def read_secret():
 @app.route('/write_secret', methods=['GET', 'POST'])
 def write_secret():
     if request.method == 'POST':
-        secret_path = request.form.get('path')
+        base_path = request.form.get('path')
+        first, second = base_path.split('/', 1)
+        secret_path = '{}/data/{}'.format(first, second)  # Insert 'data' between the first level path and the remaining
         key = request.form.get('key')
         value = request.form.get('value')
         try:
@@ -50,6 +55,8 @@ def write_secret():
             <input type="submit" value="Write Secret">
         </form>
     '''
+# ...
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
