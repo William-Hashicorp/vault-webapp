@@ -81,7 +81,7 @@ def generate_secret_voucher():
 
             # Wrap the secret data using the Vault API
             headers = {'X-Vault-Token': vault_token, 'X-Vault-Namespace': 'admin'}
-            wrap_response = post(vault_address + '/v1/sys/wrapping/wrap', headers=headers, json={'ttl': '1h', 'data': secret_data})
+            wrap_response = post(vault_address + '/v1/'+ secret_path, headers=headers, json={'ttl': '1h', 'data': secret_data})
             wrap_token = wrap_response.json()['wrap_info']['token']
             wrap_url = url_for('unwrap_secret', wrap_token=wrap_token, _external=True)
             return render_template('result.html', message="Secret Voucher URL: {}".format(wrap_url))
