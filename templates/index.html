@@ -2,16 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vault Web App</title>
 </head>
 <body>
-    <h1>Welcome! The Web App to demo Vault KV read and write</h1>
-    <form action="/read_secret" method="GET">
-        <button type="submit">Read Secret</button>
-    </form>
-    <form action="/write_secret" method="GET">
-        <button type="submit">Write Secret</button>
-    </form>
+    <h1>Vault Web App</h1>
+    <a href="{{ url_for('read_secret') }}">Read Secret</a><br>
+    <a href="{{ url_for('write_secret') }}">Write Secret</a><br>
+    <a href="{{ url_for('generate_secret_voucher') }}">Generate Secret Voucher</a>
 </body>
 </html>

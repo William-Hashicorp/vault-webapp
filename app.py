@@ -66,5 +66,35 @@ def write_secret():
         </form>
     '''
 
+@app.route('/generate_secret_voucher', methods=['GET', 'POST'])
+def generate_secret_voucher():
+    if request.method == 'POST':
+        base_path = request.form.get('path')
+        first, second = base_path.split('/', 1)
+        secret_path = '{}/data/{}'.format(first, second)
+        try:
+            wrap_response = client.create_wrapping_token(ttl='1h', wrap_path=secret_path)
+            wrap_token = wrap_response['wrap_info']['token']
+            wrap_url = url_for('unwrap_secret', wrap_token=wrap_token, _external=True)
+            return render_template('result.html', message="Secret Voucher URL: {}".format(wrap_url))
+        except Exception as e:
+            return render_template('result.html', message="Error generating secret voucher: {}".format(e))
+    return '''
+        <form method="post">
+            Path: <input type="text" name="path"><br>
+            <input type="submit" value="Generate Secret Voucher">
+        </form>
+    '''
+
+@app.route('/unwrap_secret/<wrap_token>', methods=['GET'])
+def unwrap_secret(wrap_token):
+    try:
+        unwrap_response = client.unwrap(wrap_token)
+        secret_data = unwrap_response['data']['data']
+        return render_template('result.html', message="Unwrapped Secret Data: {}".format(secret_data))
+    except Exception as e:
+        return render_template('result.html', message="Error unwrapping secret: {}".format(e))
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
