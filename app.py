@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 load_dotenv('var.env')
 
 # Get the Vault address and token from the environment variables
-vault_address = os.environ['VAULT_ADDRESS']
-vault_token = os.environ['VAULT_TOKEN']
+vault_address = os.environ['vault_address']
+vault_token = os.environ['vault_token']
 
 # Initialize the Vault client with the 'admin' namespace
 client = hvac.Client(url=vault_address, token=vault_token, namespace="admin")
