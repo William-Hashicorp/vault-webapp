@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 import hvac
 import os
 from dotenv import load_dotenv
+from requests import post
 
 # Load the environment variables from var.env
 load_dotenv('var.env')
@@ -66,6 +67,8 @@ def write_secret():
         </form>
     '''
 
+
+
 @app.route('/generate_secret_voucher', methods=['GET', 'POST'])
 def generate_secret_voucher():
     if request.method == 'POST':
@@ -73,8 +76,13 @@ def generate_secret_voucher():
         first, second = base_path.split('/', 1)
         secret_path = '{}/data/{}'.format(first, second)
         try:
-            wrap_response = client.create_wrapping_token(ttl='1h', wrap_path=secret_path)
-            wrap_token = wrap_response['wrap_info']['token']
+            secret_response = client.read(secret_path)
+            secret_data = secret_response['data']['data']
+
+            # Wrap the secret data using the Vault API
+            headers = {'X-Vault-Token': vault_token, 'X-Vault-Namespace': 'admin'}
+            wrap_response = post(vault_address + '/v1/sys/wrapping/wrap', headers=headers, json={'ttl': '1h', 'data': secret_data})
+            wrap_token = wrap_response.json()['wrap_info']['token']
             wrap_url = url_for('unwrap_secret', wrap_token=wrap_token, _external=True)
             return render_template('result.html', message="Secret Voucher URL: {}".format(wrap_url))
         except Exception as e:
@@ -86,14 +94,18 @@ def generate_secret_voucher():
         </form>
     '''
 
+
 @app.route('/unwrap_secret/<wrap_token>', methods=['GET'])
 def unwrap_secret(wrap_token):
     try:
-        unwrap_response = client.unwrap(wrap_token)
-        secret_data = unwrap_response['data']['data']
+        # Unwrap the secret using the Vault API
+        headers = {'X-Vault-Token': wrap_token, 'X-Vault-Namespace': 'admin'}
+        unwrap_response = post(vault_address + '/v1/sys/wrapping/unwrap', headers=headers)
+        secret_data = unwrap_response.json()['data']
         return render_template('result.html', message="Unwrapped Secret Data: {}".format(secret_data))
     except Exception as e:
         return render_template('result.html', message="Error unwrapping secret: {}".format(e))
+
 
 
 if __name__ == '__main__':
