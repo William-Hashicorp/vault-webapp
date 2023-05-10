@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # Update these values with your Vault address and token
 vault_address = "https://zero-trust-123860-public-vault-8df837fe.aef8576b.z1.hashicorp.cloud:8200"
-vault_token = "hvs.CAESIDLXrYDNb5JNglYYmr5Yv9q_1TLHFnxfRPnnjjq_kWm7GicKImh2cy4zWnh5a2czNE9kZHVlenJiTThHd1ZSdHEuVzhqVUoQ4xM"
+vault_token = "hvs.xxx"
 
 # Initialize the Vault client with the 'admin' namespace
 client = hvac.Client(url=vault_address, token=vault_token, namespace="admin")
