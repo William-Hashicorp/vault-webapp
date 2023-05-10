@@ -10,11 +10,17 @@
         alert('URL copied to clipboard!');
       }
     </script>
+    <style>
+      #wrapUrl {
+        width: 80%;
+        border: 1px solid #ccc;
+      }
+    </style>
   </head>
   <body>
     <h1>{{ message }}</h1>
     {% if url %}
-      <pre><input type="text" id="wrapUrl" value="{{ url }}" readonly style="border: none;"></pre>
+      <pre><input type="text" id="wrapUrl" value="{{ url }}" readonly></pre>
       <button onclick="copyUrlToClipboard()">Copy URL</button>
     {% endif %}
     <a href="/">Back</a>
