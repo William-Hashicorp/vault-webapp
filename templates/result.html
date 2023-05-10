@@ -7,6 +7,9 @@
 </head>
 <body>
     <h1>{{ message }}</h1>
-    <a href="/">Go Back</a>
-</body>
+    {% if url %}
+      <pre>{{ url }}</pre>
+    {% endif %}
+    <a href="/">Back</a>
+  </body>
 </html>
