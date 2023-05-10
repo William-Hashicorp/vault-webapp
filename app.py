@@ -78,7 +78,7 @@ def generate_secret_voucher():
         first, second = base_path.split('/', 1)
         secret_path = '{}/data/{}'.format(first, second)
         try:
-            secret_response = client.read(secret_path[4:])
+            secret_response = client.read(secret_path)
             secret_data = secret_response['data']['data']
 
             # Wrap the secret data using the Vault API
@@ -86,7 +86,8 @@ def generate_secret_voucher():
             wrap_response = post(vault_address + '/v1/sys/wrapping/wrap', headers=headers, json=secret_data)
             wrap_token = wrap_response.json()['wrap_info']['token']
             wrap_url = url_for('unwrap_secret', wrap_token=wrap_token, _external=True)
-            return render_template('result.html', message="Secret Voucher URL: {}".format(wrap_url))
+            return render_template('result.html', message="Secret Voucher URL: {}".format(secret_data))
+            # return render_template('result.html', message="Secret Voucher URL: {}".format(wrap_url))
         except Exception as e:
             return render_template('result.html', message="Error generating secret voucher: {}".format(e))
     return '''
