@@ -95,16 +95,19 @@ def generate_secret_voucher():
     '''
 
 
+
 @app.route('/unwrap_secret/<wrap_token>', methods=['GET'])
 def unwrap_secret(wrap_token):
     try:
         # Unwrap the secret using the Vault API
-        headers = {'X-Vault-Token': wrap_token, 'X-Vault-Namespace': 'admin'}
-        unwrap_response = post(vault_address + '/v1/sys/wrapping/unwrap', headers=headers)
+        headers = {'X-Vault-Token': vault_token, 'X-Vault-Namespace': 'admin'}
+        payload = {'token': wrap_token}
+        unwrap_response = post(vault_address + '/v1/sys/wrapping/unwrap', headers=headers, json=payload)
         secret_data = unwrap_response.json()['data']
         return render_template('result.html', message="Unwrapped Secret Data: {}".format(secret_data))
     except Exception as e:
         return render_template('result.html', message="Error unwrapping secret: {}".format(e))
+
 
 
 
