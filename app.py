@@ -1,14 +1,19 @@
 from flask import Flask, render_template, request, redirect, url_for
 import hvac
+import os
+from dotenv import load_dotenv
 
-app = Flask(__name__)
+# Load the environment variables from var.env
+load_dotenv('var.env')
 
-# Update these values with your Vault address and token
-vault_address = "https://zero-trust-123860-public-vault-8df837fe.aef8576b.z1.hashicorp.cloud:8200"
-vault_token = "hvs.xxx"
+# Get the Vault address and token from the environment variables
+vault_address = os.environ['VAULT_ADDRESS']
+vault_token = os.environ['VAULT_TOKEN']
 
 # Initialize the Vault client with the 'admin' namespace
 client = hvac.Client(url=vault_address, token=vault_token, namespace="admin")
+
+# ... rest of the code ...
 
 @app.route('/')
 def index():
