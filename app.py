@@ -9,10 +9,10 @@ from requests import post, HTTPError
 load_dotenv('var.env')
 
 # Get the Vault address and token from the environment variables
-vault_address = os.environ['VAULT_ADDRESS']
+vault_address = os.environ['VAULT_ADDR']
 vault_token = os.environ['VAULT_TOKEN']
 
-# Initialize the Vault client with the 'admin' namespace
+# Initialize the Vault client with the HCP VAult 'admin' namespace 
 client = hvac.Client(url=vault_address, token=vault_token, namespace="admin")
 
 app = Flask(__name__)
@@ -100,6 +100,7 @@ def generate_secret_voucher():
 
 
 
+# use hvac method, but it does not handle error message correctly.
 
 # @app.route('/unwrap_secret/<wrap_token>', methods=['GET'])
 # def unwrap_secret(wrap_token):
@@ -114,6 +115,7 @@ def generate_secret_voucher():
 #     except Exception as e:
 #         return render_template('result.html', message="Error unwrapping secret: {}".format(e))
 
+#  hvac doesn't provide a direct way to handle HTTP status codes. To obtain specific HTTP status codes, we need to make HTTP requests directly.
 
 @app.route('/unwrap_secret/<wrap_token>', methods=['GET'])
 def unwrap_secret(wrap_token):
