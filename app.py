@@ -29,7 +29,8 @@ def read_secret():
         try:
             secret_response = client.read(secret_path)
             secret_data = secret_response['data']['data']
-            return render_template('result.html', message="Secret data: {}".format(secret_data))
+            # return render_template('result.html', message="Secret data: {}".format(secret_data))
+            return render_template('result.html', message="Secret data:", secret_data=secret_data)
         except Exception as e:
             return render_template('result.html', message="Error fetching secret: {}".format(e))
     return '''
