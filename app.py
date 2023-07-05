@@ -3,6 +3,7 @@ import hvac
 import os
 from dotenv import load_dotenv
 from requests import post
+from requests import post, HTTPError
 
 # Load the environment variables from var.env
 load_dotenv('var.env')
@@ -100,6 +101,20 @@ def generate_secret_voucher():
 
 
 
+# @app.route('/unwrap_secret/<wrap_token>', methods=['GET'])
+# def unwrap_secret(wrap_token):
+#     try:
+#         # Unwrap the secret using the Vault API
+#         headers = {'X-Vault-Token': vault_token, 'X-Vault-Namespace': 'admin'}
+#         payload = {'token': wrap_token}
+#         unwrap_response = post(vault_address + '/v1/sys/wrapping/unwrap', headers=headers, json=payload)
+#         secret_data = unwrap_response.json()['data']
+#         return render_template('result.html', message="Unwrapped Secret Data:", secret_data=secret_data)
+    
+#     except Exception as e:
+#         return render_template('result.html', message="Error unwrapping secret: {}".format(e))
+
+
 @app.route('/unwrap_secret/<wrap_token>', methods=['GET'])
 def unwrap_secret(wrap_token):
     try:
@@ -107,12 +122,18 @@ def unwrap_secret(wrap_token):
         headers = {'X-Vault-Token': vault_token, 'X-Vault-Namespace': 'admin'}
         payload = {'token': wrap_token}
         unwrap_response = post(vault_address + '/v1/sys/wrapping/unwrap', headers=headers, json=payload)
+        unwrap_response.raise_for_status()  # Raises a HTTPError if the response status is 4xx, 5xx
+        
         secret_data = unwrap_response.json()['data']
-        #return render_template('result.html', message="Unwrapped Secret Data: {}".format(secret_data))
         return render_template('result.html', message="Unwrapped Secret Data:", secret_data=secret_data)
     
+    except requests.HTTPError:
+        # Extract the error message from the Vault response
+        error_message = unwrap_response.json().get('errors', [])
+        error_message = "\n".join(error_message) if error_message else "HTTP error occurred"
+        return render_template('result.html', message="Error unwrapping secret: {}".format(error_message))
     except Exception as e:
-        return render_template('result.html', message="Error unwrapping secret: {}".format(e))
+        return render_template('result.html', message="Unexpected error: {}".format(e))
 
 
 
