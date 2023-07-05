@@ -117,28 +117,23 @@ def generate_secret_voucher():
 
 @app.route('/unwrap_secret/<wrap_token>', methods=['GET'])
 def unwrap_secret(wrap_token):
-    unwrap_response = None
     try:
         # Unwrap the secret using the Vault API
         headers = {'X-Vault-Token': vault_token, 'X-Vault-Namespace': 'admin'}
         payload = {'token': wrap_token}
         unwrap_response = post(vault_address + '/v1/sys/wrapping/unwrap', headers=headers, json=payload)
-        unwrap_response.raise_for_status()  # Raises a HTTPError if the response status is 4xx, 5xx
+
+        # check if the request was successful
+        if unwrap_response.status_code != 200:
+            # extract the error message from the JSON response
+            error_message = unwrap_response.json().get('errors', [])
+            error_message = "\n".join(error_message) if error_message else "HTTP error occurred"
+            return render_template('result.html', message="Error unwrapping secret: {}".format(error_message))
         
         secret_data = unwrap_response.json()['data']
         return render_template('result.html', message="Unwrapped Secret Data:", secret_data=secret_data)
-    
-    except requests.HTTPError:
-        # Extract the error message from the Vault response
-        if unwrap_response is not None:
-            error_message = unwrap_response.json().get('errors', [])
-            error_message = "\n".join(error_message) if error_message else "HTTP error occurred"
-        else:
-            error_message = "HTTP error occurred, but no response was received from the server."
-        return render_template('result.html', message="Error unwrapping secret: {}".format(error_message))
     except Exception as e:
         return render_template('result.html', message="Unexpected error: {}".format(e))
-
 
 
 if __name__ == '__main__':
