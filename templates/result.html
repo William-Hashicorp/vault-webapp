@@ -17,10 +17,22 @@
       }
     </style>
   </head>
-  <body>
+  <!-- <body>
     <h1>{{ message }}</h1>
     {% if url %}
       <pre><input type="text" id="wrapUrl" value="{{ url }}" readonly></pre>
+      <button onclick="copyUrlToClipboard()">Copy URL</button>
+    {% endif %}
+    <a href="/">Back</a>
+  </body> -->
+  <body>
+    <h1>{{ message }}</h1>
+    {% if secret_data %}
+      <ul>
+        {% for key, value in secret_data.items() %}
+          <li>{{ key }}: {{ value }}</li>
+        {% endfor %}
+      </ul>
       <button onclick="copyUrlToClipboard()">Copy URL</button>
     {% endif %}
     <a href="/">Back</a>
