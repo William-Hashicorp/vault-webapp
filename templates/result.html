@@ -25,8 +25,11 @@
           <li>{{ key }}: {{ value }}</li>
         {% endfor %}
       </ul>
-      <button onclick="copyUrlToClipboard()">Copy URL</button>
+       {% endif %}
+    {% if url %}
+       <pre><input type="text" id="wrapUrl" value="{{ url }}" readonly></pre>
+       <button onclick="copyUrlToClipboard()">Copy URL</button>
     {% endif %}
-    <a href="/">Back</a>
+       <a href="/">Back</a>
   </body>
 </html>
